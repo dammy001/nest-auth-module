@@ -24,11 +24,11 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "db-deploy": "npx prisma migrate deploy",
-    "db-migrate": "npx prisma migrate dev",
-    "db-seed": "npx prisma db seed",
-    "db-studio": "npx prisma studio",
-    "generate-schemas": "prisma generate && prisma format",
+    "db:deploy": "npx prisma migrate deploy",
+    "db:migrate": "npx prisma migrate dev",
+    "db:seed": "npx prisma db seed",
+    "db:studio": "npx prisma studio",
+    "db:generate-schemas": "prisma generate && prisma format",
     "postinstall": "simple-git-hooks && pnpm generate-schemas"
   },
   "dependencies": {
@@ -43,6 +43,7 @@
     "compression": "^1.7.4",
     "dayjs": "^1.11.9",
     "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "zod": "^3.21.4"
