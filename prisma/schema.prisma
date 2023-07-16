@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "views"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator zod {
+  provider      = "zod-prisma"
+  output        = "./zod"
+  // imports       = "./zod-utils"
+  relationModel = "default"
+}
+
+// generator enums {
+//   provider = "ts-node --transpile-only ./enum-generator"
+// }
+
+model User {
+  id            String    @id @default(cuid()) @db.Char(36)
+  firstName     String    @map("first_name") @db.VarChar(100)
+  lastName      String    @map("last_name") @db.VarChar(100)
+  email         String    @unique @db.VarChar(150)
+  emailVerified DateTime? @map("email_verified")
+  phoneNo       String    @map("phone_no") @db.VarChar(50)
+  role          ROLE      @default(USER)
+  verified      Boolean?  @default(false) @db.UnsignedTinyInt
+  password String
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  Device    Device[]
+
+  @@index([emailVerified])
+  @@index([deletedAt])
+  @@index([createdAt])
+  @@index([verified])
+  @@map(name: "users")
+}
+
+model Device {
+  id         Int      @id @default(autoincrement()) @db.UnsignedMediumInt
+  userId     String   @map("user_id") @db.VarChar(36)
+  userAgent  String   @map("user_agent")
+  ip         String?  @db.VarChar(30)
+  deviceName String?  @map(name: "device_name")
+  active     Boolean? @default(false) @db.UnsignedTinyInt
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([active])
+  @@index([userId, deviceName])
+  @@map(name: "devices")
+}
+
+enum ROLE {
+  USER  @map("user")
+  ADMIN @map("admin")
+}
+
+enum TimeUnit {
+  DAY    @map("day")
+  HOUR   @map("hour")
+  MINUTE @map("minute")
+}
