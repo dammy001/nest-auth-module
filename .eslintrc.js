@@ -5,7 +5,6 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js'],
   rules: {
     '@typescript-eslint/consistent-type-imports': 'off',
     'no-useless-constructor': 'off',

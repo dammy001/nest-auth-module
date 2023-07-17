@@ -31,7 +31,7 @@ model User {
   phoneNo       String    @map("phone_no") @db.VarChar(50)
   role          ROLE      @default(USER)
   verified      Boolean?  @default(false) @db.UnsignedTinyInt
-  password String
+  password      String
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
