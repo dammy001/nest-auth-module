@@ -8,6 +8,7 @@ import {
 import * as bodyParser from 'body-parser';
 import helmet from 'helmet';
 import compression from 'compression';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ResponseInterceptor } from './shared/response.interceptor';
 
@@ -72,6 +73,19 @@ async function bootstrap() {
 
   app.use(bodyParser.json({ limit: '5mb' }));
   app.use(bodyParser.urlencoded({ extended: true }));
+
+  const options = new DocumentBuilder()
+    .setTitle('Auth API')
+    .setDescription('The Novu API description')
+    .setVersion('1.0')
+    .addTag('Auth')
+    .addTag('Password')
+    .addTag('Email Verification')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, options);
+
+  SwaggerModule.setup('docs', app, document);
 
   Logger.log('Bootstrap successfully');
 
