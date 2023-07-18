@@ -21,7 +21,13 @@
     "noFallthroughCasesInSwitch": false,
     "declarationMap": true,
     "allowJs": false,
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@": ["./"],
+      "@/*": ["./*"],
+      "@prisma": ["./prisma"],
+      "@prisma/*": ["./prisma/*"]
+    }
   },
   "exclude": ["node_modules", "dist", "prisma/zod/**/*"]
 }
