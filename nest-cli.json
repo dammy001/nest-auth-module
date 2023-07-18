@@ -7,11 +7,19 @@
     "assets": [
       {
         "include": ".env",
-        "outDir": "dist/src",
-        "watchAssets": true
+        "outDir": "dist/src"
       }
     ],
-    "builder": "swc",
+    "plugins": [
+      {
+        "name": "@nestjs/swagger",
+        "options": {
+          "classValidatorShim": true,
+          "introspectComments": true
+        }
+      }
+    ],
+    "builder": "webpack",
     "typeCheck": false
   }
 }

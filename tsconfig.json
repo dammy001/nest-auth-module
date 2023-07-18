@@ -26,8 +26,10 @@
       "@": ["./"],
       "@/*": ["./*"],
       "@prisma": ["./prisma"],
-      "@prisma/*": ["./prisma/*"]
+      "@prisma/*": ["./prisma/*"],
+      "@shared": ["./src/shared"],
+      "@shared/*": ["./src/shared/*"]
     }
   },
-  "exclude": ["node_modules", "dist", "prisma/zod/**/*"]
+  "exclude": ["node_modules", "dist"]
 }

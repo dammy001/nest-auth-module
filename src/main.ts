@@ -10,7 +10,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { ResponseInterceptor } from './shared/response.interceptor';
+import { ResponseInterceptor } from './shared/framework/response.interceptor';
 
 const mapCorsOptions = function (req, callback): void {
   const options = {

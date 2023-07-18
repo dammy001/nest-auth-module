@@ -1,5 +1,5 @@
 import { ROLE } from '@prisma/client';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { hashPassword } from '../src/lib/hash-password';
 import prisma from '.';
 

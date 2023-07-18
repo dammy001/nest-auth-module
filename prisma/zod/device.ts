@@ -21,6 +21,7 @@ export interface CompleteDevice extends z.infer<typeof _DeviceModel> {
  *
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
+// @ts-expect-error unknown
 export const DeviceModel: z.ZodSchema<CompleteDevice> = z.lazy(() =>
   _DeviceModel.extend({
     user: UserModel,
