@@ -76,7 +76,7 @@ async function bootstrap() {
 
   const options = new DocumentBuilder()
     .setTitle('Auth API')
-    .setDescription('The Novu API description')
+    .setDescription('Auth API description')
     .setVersion('1.0')
     .addTag('Auth')
     .addTag('Password')
