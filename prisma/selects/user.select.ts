@@ -7,5 +7,6 @@ export const userSelect = Prisma.validator<Prisma.UserSelect>()({
   phoneNo: true,
   emailVerified: true,
   verified: true,
+  password: true,
   createdAt: true,
 });

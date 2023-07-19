@@ -7,21 +7,38 @@ export class BaseRepository<TModel = any> {
     protected entity: ClassConstructor<any>,
   ) {}
 
-  async findOne<WhereInputArgs, SelectArgs = object>(
+  async findOne<WhereInputArgs, SelectArgs = object, IncludeArgs = object>(
     where: WhereInputArgs,
-    select: SelectArgs = {} as any,
+    select?: SelectArgs,
+    include?: IncludeArgs,
   ) {
     // @ts-expect-error typing
-    const data = await this.model.findFirst({ where, select });
+    const data = await this.model.findFirst({
+      where,
+      ...(!select && include && { include }),
+      ...(!include && select && { select }),
+    });
 
     return this.mapEntity(data);
   }
 
-  async findById<SelectArgs = object>(
-    id: string,
-    select: SelectArgs = {} as any,
+  async findById<SelectArgs = object>(id: string, select?: SelectArgs) {
+    return await this.findOne<any>({ id, select });
+  }
+
+  async update<WhereInputArgs, SelectArgs = object, IncludeArgs = object>(
+    where: WhereInputArgs,
+    select?: SelectArgs,
+    include?: IncludeArgs,
   ) {
-    return await this.findOne<any>({ where: { id }, select });
+    // @ts-expect-error typing
+    const data = await this.model.update({
+      where,
+      ...(!select && include && { include }),
+      ...(!include && select && { select }),
+    });
+
+    return this.mapEntity(data);
   }
 
   protected mapEntity<TData>(data: TData): TData extends null ? null : any {
