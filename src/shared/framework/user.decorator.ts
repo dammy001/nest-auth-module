@@ -1,5 +1,5 @@
 import { UnauthorizedException, createParamDecorator } from '@nestjs/common';
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 export const User = createParamDecorator((data, ctx) => {
   const req = ctx.switchToHttp().getRequest();

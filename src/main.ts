@@ -57,13 +57,13 @@ async function bootstrap() {
       exceptionFactory: (errors: ValidationError[]) => {
         throw new UnprocessableEntityException({
           message: 'Invalid data provided',
-          errors: errors
-            .map(({ property, constraints }: ValidationError) => {
-              const response: Record<string, unknown> = {};
-              response[`${property}`] = Object.values(constraints);
+          errors: errors.reduce(
+            (response, { property, constraints }: ValidationError) => {
+              response[property] = Object.values(constraints);
               return response;
-            })
-            .reduce((a, v) => ({ ...a, ...v }), {}),
+            },
+            {},
+          ),
         });
       },
     }),
