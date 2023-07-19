@@ -5,6 +5,8 @@ import { JwtAuthGuard } from '../../shared/framework/auth.guard';
 import { AuthService } from './services/auth.service';
 import { JwtStrategy } from './services/passport/jwt.strategy';
 import { AuthController } from './auth.controller';
+import { SCENERIOS } from './scenerios';
+import { SharedModule } from '@/src/shared/shared.module';
 
 @Module({
   imports: [
@@ -17,9 +19,10 @@ import { AuthController } from './auth.controller';
         expiresIn: 360000,
       },
     }),
+    SharedModule,
   ],
   controllers: [AuthController],
-  providers: [JwtAuthGuard, JwtStrategy, AuthService],
+  providers: [JwtAuthGuard, JwtStrategy, AuthService, ...SCENERIOS],
   exports: [JwtAuthGuard, AuthService],
 })
 export class AuthModule {}

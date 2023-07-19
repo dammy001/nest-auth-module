@@ -8,5 +8,6 @@ module.exports = {
   rules: {
     '@typescript-eslint/consistent-type-imports': 'off',
     'no-useless-constructor': 'off',
+    'no-return-await': 'off',
   },
 };

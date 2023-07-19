@@ -11,7 +11,7 @@ declare global {
 const prismaOptions: Prisma.PrismaClientOptions = {};
 
 if (process.env.NODE_ENV !== 'production')
-  prismaOptions.log = ['query', 'error', 'warn'];
+  prismaOptions.log = ['query', 'error', 'warn'] as Prisma.LogLevel[];
 
 export const prisma = globalThis.prisma || new PrismaClient(prismaOptions);
 

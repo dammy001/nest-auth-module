@@ -33,13 +33,13 @@ model User {
   emailVerified DateTime? @map("email_verified")
   phoneNo       String    @map("phone_no") @db.VarChar(50)
   role          ROLE      @default(USER)
-  verified      Boolean  @default(false) @db.UnsignedTinyInt
+  verified      Boolean   @default(false) @db.UnsignedTinyInt
   password      String
 
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
-  Device    Device[]
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  deletedAt          DateTime?            @map("deleted_at")
+  Device             Device[]
   FailedLoginAttempt FailedLoginAttempt[]
 
   @@index([emailVerified])
@@ -51,11 +51,11 @@ model User {
 }
 
 model Device {
-  id         Int      @id @default(autoincrement()) @db.UnsignedMediumInt
-  userId     String   @map("user_id") @db.VarChar(36)
-  userAgent  String   @map("user_agent")
-  ip         String?  @db.VarChar(30)
-  deviceName String?  @map(name: "device_name")
+  id         Int     @id @default(autoincrement()) @db.UnsignedMediumInt
+  userId     String  @map("user_id") @db.VarChar(36)
+  userAgent  String  @map("user_agent")
+  ip         String? @db.VarChar(30)
+  deviceName String? @map(name: "device_name")
   active     Boolean @default(false) @db.UnsignedTinyInt
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -69,9 +69,9 @@ model Device {
 }
 
 model FailedLoginAttempt {
-  id         Int      @id @default(autoincrement()) @db.UnsignedMediumInt
-  userId     String   @map("user_id") @db.VarChar(36)
-  attempts Int @db.UnsignedSmallInt
+  id              Int      @id @default(autoincrement()) @db.UnsignedMediumInt
+  userId          String   @map("user_id") @db.VarChar(36)
+  attempts        Int      @db.UnsignedSmallInt
   lastAttemptTime DateTime @map("last_attempt_time")
 
   createdAt DateTime @default(now()) @map("created_at")

@@ -28,7 +28,9 @@
       "@prisma": ["./prisma"],
       "@prisma/*": ["./prisma/*"],
       "@shared": ["./src/shared"],
-      "@shared/*": ["./src/shared/*"]
+      "@shared/*": ["./src/shared/*"],
+      "@repositories": ["./src/lib/repositories"],
+      "@repositories/*": ["./src/lib/repositories/*"]
     }
   },
   "exclude": ["node_modules", "dist"]

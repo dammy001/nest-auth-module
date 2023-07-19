@@ -25,7 +25,7 @@ async function createUser(data: {
   });
 
   console.log(
-    `👤 Upserted successfully with email "${data.email}" & password "${data.password}".`,
+    `👤 Upserted successfully with email: "${data.email}" & password: "password".`,
   );
 
   return user;
