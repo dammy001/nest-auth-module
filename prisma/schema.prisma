@@ -3,7 +3,7 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearch", "views"]
+  previewFeatures = ["fullTextSearch", "fullTextIndex", "views"]
 }
 
 datasource db {
@@ -15,7 +15,7 @@ generator zod {
   provider      = "zod-prisma"
   output        = "./zod"
   // imports       = "./zod-utils"
-  relationModel = "default"
+  relationModel = true
 }
 
 // generator enums {
@@ -24,24 +24,29 @@ generator zod {
 
 model User {
   id            String    @id @default(cuid()) @db.Char(36)
+  /// @zod.max(100, { message: "first name must be shorter than 100 characters" })
   firstName     String    @map("first_name") @db.VarChar(100)
+  /// @zod.max(100, { message: "last name must be shorter than 100 characters" })
   lastName      String    @map("last_name") @db.VarChar(100)
+  /// @zod.max(150, { message: "email must be shorter than 100 characters" })
   email         String    @unique @db.VarChar(150)
   emailVerified DateTime? @map("email_verified")
   phoneNo       String    @map("phone_no") @db.VarChar(50)
   role          ROLE      @default(USER)
-  verified      Boolean?  @default(false) @db.UnsignedTinyInt
+  verified      Boolean  @default(false) @db.UnsignedTinyInt
   password      String
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
   Device    Device[]
+  FailedLoginAttempt FailedLoginAttempt[]
 
   @@index([emailVerified])
   @@index([deletedAt])
   @@index([createdAt])
   @@index([verified])
+  @@fulltext([firstName, lastName, email])
   @@map(name: "users")
 }
 
@@ -51,7 +56,7 @@ model Device {
   userAgent  String   @map("user_agent")
   ip         String?  @db.VarChar(30)
   deviceName String?  @map(name: "device_name")
-  active     Boolean? @default(false) @db.UnsignedTinyInt
+  active     Boolean @default(false) @db.UnsignedTinyInt
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -61,6 +66,20 @@ model Device {
   @@index([active])
   @@index([userId, deviceName])
   @@map(name: "devices")
+}
+
+model FailedLoginAttempt {
+  id         Int      @id @default(autoincrement()) @db.UnsignedMediumInt
+  userId     String   @map("user_id") @db.VarChar(36)
+  attempts Int @db.UnsignedSmallInt
+  lastAttemptTime DateTime @map("last_attempt_time")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("failed_login_attempts")
 }
 
 enum ROLE {

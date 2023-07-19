@@ -20,6 +20,19 @@ export const customPrisma = (options: Prisma.PrismaClientOptions) =>
 
 if (process.env.NODE_ENV !== 'production') globalThis.prisma = prisma;
 
+prisma.$extends({
+  result: {
+    user: {
+      fullName: {
+        needs: { firstName: true, lastName: true },
+        compute(user) {
+          return `${user.firstName} ${user.lastName}`;
+        },
+      },
+    },
+  },
+});
+
 // If any changed on middleware server restart is required
 softDeleteMiddleware(prisma);
 
