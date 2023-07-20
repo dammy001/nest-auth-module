@@ -4,12 +4,7 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "deleteOutDir": true,
-    "assets": [
-      {
-        "include": ".env",
-        "outDir": "dist/src"
-      }
-    ],
+    "assets": [],
     "plugins": [
       {
         "name": "@nestjs/swagger",
@@ -20,6 +15,7 @@
       }
     ],
     "builder": "webpack",
+    "watchAssets": true,
     "typeCheck": false
   }
 }

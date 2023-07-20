@@ -26,19 +26,26 @@ export class BaseRepository<TModel = any> {
     return await this.findOne<any>({ id, select });
   }
 
-  async update<WhereInputArgs, SelectArgs = object, IncludeArgs = object>(
+  async update<WhereInputArgs, TData = any, SelectArgs = object>(
     where: WhereInputArgs,
+    data: TData,
     select?: SelectArgs,
-    include?: IncludeArgs,
-  ) {
+  ): Promise<any> {
     // @ts-expect-error typing
-    const data = await this.model.update({
+    return await this.model.update({
       where,
-      ...(!select && include && { include }),
-      ...(!include && select && { select }),
+      data,
+      ...{ select },
     });
+  }
 
-    return this.mapEntity(data);
+  async upsert() {}
+
+  async delete<WhereInputArgs>(where: WhereInputArgs): Promise<any> {
+    // @ts-expect-error typing
+    return await this.model.delete({
+      where,
+    });
   }
 
   protected mapEntity<TData>(data: TData): TData extends null ? null : any {

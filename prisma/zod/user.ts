@@ -30,7 +30,7 @@ export const UserModel = z.object({
 
 export interface CompleteUser extends z.infer<typeof UserModel> {
   Device?: CompleteDevice[];
-  FailedLoginAttempt?: CompleteFailedLoginAttempt[];
+  FailedLoginAttempt?: CompleteFailedLoginAttempt | null;
 }
 
 /**
@@ -41,6 +41,6 @@ export interface CompleteUser extends z.infer<typeof UserModel> {
 export const RelatedUserModel: z.ZodSchema<CompleteUser> = z.lazy(() =>
   UserModel.extend({
     Device: RelatedDeviceModel.array(),
-    FailedLoginAttempt: RelatedFailedLoginAttemptModel.array(),
+    FailedLoginAttempt: RelatedFailedLoginAttemptModel.nullish(),
   }),
 );
