@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
-import { UserRepository } from '../lib/repositories/user';
+import {
+  FailedLoginAttemptRepository,
+  UserRepository,
+} from '../lib/repositories';
 
-const PROVIDERS = [UserRepository];
+const PROVIDERS = [UserRepository, FailedLoginAttemptRepository];
 
 @Module({
   imports: [],

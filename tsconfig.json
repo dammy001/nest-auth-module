@@ -21,17 +21,16 @@
     "noFallthroughCasesInSwitch": false,
     "declarationMap": true,
     "allowJs": false,
-    "types": ["node"],
+    "types": ["node", "vitest/globals"],
     "paths": {
       "@": ["./"],
       "@/*": ["./*"],
-      "@prisma": ["./prisma"],
-      "@prisma/*": ["./prisma/*"],
+      "@prisma-lib": ["./src/lib/prisma"],
+      "@prisma-lib/*": ["./src/lib/prisma/*"],
       "@shared": ["./src/shared"],
       "@shared/*": ["./src/shared/*"],
       "@repositories": ["./src/lib/repositories"],
       "@repositories/*": ["./src/lib/repositories/*"]
     }
-  },
-  "exclude": ["node_modules", "dist"]
+  }
 }

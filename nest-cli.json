@@ -14,8 +14,7 @@
         }
       }
     ],
-    "builder": "webpack",
-    "watchAssets": true,
+    "builder": "swc",
     "typeCheck": false
   }
 }

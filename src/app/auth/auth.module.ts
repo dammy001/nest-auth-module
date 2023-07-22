@@ -14,7 +14,7 @@ import { SharedModule } from '@/src/shared/shared.module';
       defaultStrategy: 'jwt',
     }),
     JwtModule.register({
-      secretOrKeyProvider: () => process.env.JWT_SECRET as string,
+      secretOrKeyProvider: () => process.env.JWT_SECRET ?? 'secret',
       signOptions: {
         expiresIn: 360000,
       },

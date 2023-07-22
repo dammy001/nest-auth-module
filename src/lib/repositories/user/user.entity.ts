@@ -26,7 +26,7 @@ export class UserEntity {
 
   updatedAt: Date;
 
-  failedLoginAttempt?: CompleteFailedLoginAttempt;
+  FailedLoginAttempt?: CompleteFailedLoginAttempt;
 
   @Exclude({ toPlainOnly: true })
   deletedAt: Date | null;

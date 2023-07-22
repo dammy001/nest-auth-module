@@ -39,7 +39,23 @@ export class BaseRepository<TModel = any> {
     });
   }
 
-  async upsert() {}
+  async create<TData = any>(data: TData): Promise<any> {
+    // @ts-expect-error typing
+    return await this.model.create({ data });
+  }
+
+  async upsert<WhereInputArgs, CreateInput, UpdateInput>(
+    where: WhereInputArgs,
+    create: CreateInput,
+    update: UpdateInput,
+  ): Promise<any> {
+    // @ts-expect-error typing
+    return await this.model.upsert({
+      where,
+      create,
+      update,
+    });
+  }
 
   async delete<WhereInputArgs>(where: WhereInputArgs): Promise<any> {
     // @ts-expect-error typing

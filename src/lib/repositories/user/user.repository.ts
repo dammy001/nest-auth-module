@@ -1,6 +1,6 @@
-import prisma from '@prisma';
+import prisma from '@prisma-lib';
 import { Prisma } from '@prisma/client';
-import { userSelect } from '@prisma/selects';
+import { userSelect } from '@prisma-lib/selects';
 import { BaseRepository } from '../base.repository';
 import { UserEntity } from './user.entity';
 

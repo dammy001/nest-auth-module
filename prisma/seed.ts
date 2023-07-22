@@ -1,6 +1,6 @@
 import { ROLE } from '@prisma/client';
 import dayjs from 'dayjs';
-import { hashPassword } from '../src/lib/hash-password';
+import { hashPassword } from '../src/shared/utils/hash-password';
 import prisma from '.';
 
 async function createUser(data: {

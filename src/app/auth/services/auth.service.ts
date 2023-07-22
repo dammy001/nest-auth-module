@@ -1,16 +1,17 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { userSelect } from '@/prisma/selects';
-import prisma from '@/prisma';
+import prisma from '@prisma-lib';
+import { userSelect } from '@/src/lib/prisma/selects';
+import { UserEntity } from '@/src/lib';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
   // eslint-disable-next-line require-await
-  async getSignedToken(user: User): Promise<string> {
-    return this.jwtService.sign(
+  async getSignedToken(user: User | UserEntity): Promise<string> {
+    return await this.jwtService.signAsync(
       { ...user },
       {
         expiresIn: '30 days',
