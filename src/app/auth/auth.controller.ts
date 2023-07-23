@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 // import { Throttle } from '@nestjs/throttler';
 import { ThrottlerForLoginGuard } from '@shared/framework';
+import { Request } from 'express';
 import { LoginBodyDto } from './dtos/login.dto';
 import { LoginCommand } from './scenerios/login/login.command';
 import { LoginAction } from './scenerios/login/login.action';
@@ -29,8 +31,8 @@ import { UserEntity } from '@/src/lib';
 @ApiTags('Auth')
 export class AuthController {
   constructor(
-    protected readonly loginAction: LoginAction,
-    protected readonly registerAction: RegisterAction,
+    protected loginAction: LoginAction,
+    protected registerAction: RegisterAction,
   ) {}
 
   @Post('login')
@@ -55,9 +57,16 @@ export class AuthController {
     type: UserEntity,
   })
   @ApiUnauthorizedResponse({ description: 'User already exists' })
-  async register(@Body() data: RegisterBodyDto) {
+  async register(@Body() data: RegisterBodyDto, @Req() request: Request) {
     return await this.registerAction.execute(
-      RegisterCommand.create({ ...data }),
+      RegisterCommand.create({
+        firstName: data.first_name,
+        lastName: data.last_name,
+        email: data.email,
+        phoneNo: data.phone_no,
+        password: data.password,
+      }),
+      request,
     );
   }
 }

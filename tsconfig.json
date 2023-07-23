@@ -25,6 +25,8 @@
     "paths": {
       "@": ["./"],
       "@/*": ["./*"],
+      "@auth": ["./src/app/auth"],
+      "@auth/*": ["./src/app/auth/*"],
       "@prisma-lib": ["./src/lib/prisma"],
       "@prisma-lib/*": ["./src/lib/prisma/*"],
       "@shared": ["./src/shared"],

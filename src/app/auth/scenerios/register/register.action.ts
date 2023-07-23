@@ -1,11 +1,17 @@
-import { BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import bcrypt from 'bcrypt';
-import { UserRepository } from '@repositories';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AuthService } from '../../services/auth.service';
-import { RegisterEvent } from '../../events/register.event';
+import { AuthService } from '@auth/services/auth.service';
+import { RegisterEvent } from '@auth/events/register.event';
+import { Request } from 'express';
+import { UserEntity, UserRepository } from '@repositories';
 import { RegisterCommand } from './register.command';
 
+@Injectable()
 export class RegisterAction {
   constructor(
     protected readonly authService: AuthService,
@@ -13,7 +19,7 @@ export class RegisterAction {
     private readonly dispatcher: EventEmitter2,
   ) {}
 
-  async execute(data: RegisterCommand): Promise<any> {
+  async execute(data: RegisterCommand, request: Request): Promise<any> {
     if (process.env.DISABLE_USER_REGISTRATION === 'true')
       throw new BadRequestException('Account creation is disabled');
 
@@ -21,15 +27,9 @@ export class RegisterAction {
       throw new BadRequestException('User already exist');
     }
 
-    const user = await this.userRepository.create({
-      ...data,
-      password: await bcrypt.hash(data.password, 10),
-    });
+    const user = await this.createUserAndRegisterDevice(data, request);
 
-    this.dispatcher.emit('registered', new RegisterEvent(user));
-
-    // send welcome notification
-    // send register event
+    this.dispatcher.emit('auth.registered', new RegisterEvent(user));
 
     delete user.FailedLoginAttempt;
 
@@ -37,5 +37,26 @@ export class RegisterAction {
       ...user,
       token: await this.authService.getSignedToken(user),
     };
+  }
+
+  private async createUserAndRegisterDevice(
+    data: RegisterCommand,
+    request: Request,
+  ): Promise<UserEntity> {
+    try {
+      return await this.userRepository.createOne({
+        ...data,
+        password: await bcrypt.hash(data.password, 10),
+        Device: {
+          create: {
+            userAgent: request.headers['user-agent'],
+            ip: request.ip,
+          },
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Unxpected error occurred');
+    }
   }
 }

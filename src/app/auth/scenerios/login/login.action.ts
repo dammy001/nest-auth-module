@@ -2,8 +2,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 import dayjs from 'dayjs';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AuthService } from '../../services/auth.service';
-import { LockoutEvent } from '../../events/lockout.event';
+import { AuthService } from '@auth/services/auth.service';
+import { LockoutEvent } from '@auth/events/lockout.event';
 import { LoginCommand } from './login.command';
 import {
   FailedLoginAttemptRepository,

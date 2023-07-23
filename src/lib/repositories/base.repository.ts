@@ -23,7 +23,7 @@ export class BaseRepository<TModel = any> {
   }
 
   async findById<SelectArgs = object>(id: string, select?: SelectArgs) {
-    return await this.findOne<any>({ id, select });
+    return this.mapEntity(await this.findOne<any>({ id, select }));
   }
 
   async update<WhereInputArgs, TData = any, SelectArgs = object>(
@@ -39,9 +39,17 @@ export class BaseRepository<TModel = any> {
     });
   }
 
-  async create<TData = any>(data: TData): Promise<any> {
+  async create<TData = any, SelectArgs = object>(
+    data: TData,
+    select?: SelectArgs,
+  ): Promise<any> {
     // @ts-expect-error typing
-    return await this.model.create({ data });
+    const created = await this.model.create({
+      data,
+      select,
+    });
+
+    return this.mapEntity(created);
   }
 
   async upsert<WhereInputArgs, CreateInput, UpdateInput>(

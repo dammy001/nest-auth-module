@@ -13,18 +13,18 @@ export class RegisterBodyDto {
   @MaxLength(100, {
     message: 'First name must be not be more than 100 characters',
   })
-  firstName: string;
+  first_name: string;
 
   @IsString()
   @IsNotEmpty()
   @MaxLength(100, {
     message: 'Last name must be not be more than 100 characters',
   })
-  lastName: string;
+  last_name: string;
 
   @IsNumberString()
   @IsNotEmpty()
-  phoneNo: string;
+  phone_no: string;
 
   @IsDefined()
   @IsNotEmpty()

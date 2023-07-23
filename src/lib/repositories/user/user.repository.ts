@@ -20,4 +20,8 @@ export class UserRepository extends BaseRepository<Prisma.UserDelegate> {
       { ...userSelect, FailedLoginAttempt: true },
     );
   }
+
+  async createOne(data: Prisma.UserCreateInput) {
+    return await this.create<Prisma.UserCreateInput>(data, { ...userSelect });
+  }
 }
