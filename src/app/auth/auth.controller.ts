@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
+  ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -36,6 +37,7 @@ export class AuthController {
   @UseGuards(ThrottlerForLoginGuard)
   // @Throttle(3, 60)
   @ApiUnauthorizedResponse({ description: 'Invalid login credentials' })
+  @ApiOkResponse({ description: 'Login successfully' })
   async login(@Body() data: LoginBodyDto) {
     const payload = await Promise.resolve(
       this.loginAction.execute(

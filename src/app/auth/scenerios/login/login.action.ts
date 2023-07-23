@@ -1,7 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 import dayjs from 'dayjs';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AuthService } from '../../services/auth.service';
+import { LockoutEvent } from '../../events/lockout.event';
 import { LoginCommand } from './login.command';
 import {
   FailedLoginAttemptRepository,
@@ -18,6 +20,7 @@ export class LoginAction {
     private readonly authService: AuthService,
     private readonly userRepository: UserRepository,
     private readonly failedLoginRepository: FailedLoginAttemptRepository,
+    private readonly dispatcher: EventEmitter2,
   ) {}
 
   async execute(data: LoginCommand): Promise<{
@@ -33,6 +36,8 @@ export class LoginAction {
     this.hasTooManyLoginAttempts(user, () => this.sendLockoutResponse(user));
 
     if (!this.attemptLogin(user, data)) {
+      this.fireLockoutEvent(user, data);
+
       this.sendFailedLoginResponse(
         user,
         await this.incrementLoginAttempts(user),
@@ -46,11 +51,15 @@ export class LoginAction {
     return { user, token: await this.authService.getSignedToken(user) };
   }
 
+  protected fireLockoutEvent(user: UserEntity, request: LoginCommand): void {
+    this.dispatcher.emit('auth.lockout', new LockoutEvent(user, request));
+  }
+
   private async attemptLogin(
     user: UserEntity,
-    credentials: LoginCommand,
+    request: LoginCommand,
   ): Promise<any> {
-    return await bcrypt.compare(credentials.password, user.password);
+    return await bcrypt.compare(request.password, user.password);
   }
 
   private sendFailedLoginResponse(

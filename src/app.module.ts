@@ -1,5 +1,6 @@
 import { DynamicModule, ForwardReference, Module, Type } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AuthModule } from './app/auth/auth.module';
 
 const modules: Array<
@@ -10,6 +11,7 @@ const modules: Array<
     ttl: 60,
     limit: 1500,
   }),
+  EventEmitterModule.forRoot(),
 ];
 
 @Module({
