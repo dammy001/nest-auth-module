@@ -11,8 +11,8 @@ import {
 
 @Injectable()
 export class LoginAction {
-  public readonly MAX_LOGIN_TRIES: number = 6;
-  public readonly BLOCKED_FOR: number = 3;
+  private readonly MAX_LOGIN_ATTEMPTS: number = 6;
+  private readonly BLOCKED_FOR: number = 3;
 
   constructor(
     private readonly authService: AuthService,
@@ -20,48 +20,65 @@ export class LoginAction {
     private readonly failedLoginRepository: FailedLoginAttemptRepository,
   ) {}
 
-  async execute(data: LoginCommand) {
+  async execute(data: LoginCommand): Promise<{
+    user: UserEntity;
+    token: string;
+  }> {
     const user = await this.userRepository.findByEmail(data.email);
 
     if (!user) {
       throw new UnauthorizedException('Invalid login credentials');
     }
 
-    this.whenAccountHasBeenBlocked(user, () => this.lockAccount(user));
+    this.hasTooManyLoginAttempts(user, () => this.sendLockoutResponse(user));
 
-    if (!(await bcrypt.compare(data.password, user.password))) {
-      const failedAttempts = await this.updateFailedAttempts(user);
-      const remainingAttempts = this.MAX_LOGIN_TRIES - failedAttempts;
-
-      if (remainingAttempts === 0 && user.FailedLoginAttempt) {
-        const blockedMinutesLeft = this.getBlockedMinutesLeft(
-          user.FailedLoginAttempt?.lastAttemptTime,
-        );
-
-        throw new UnauthorizedException(
-          `Your Account has been blocked, Please try again after ${blockedMinutesLeft} minutes`,
-        );
-      }
-
-      if (remainingAttempts < 3) {
-        throw new UnauthorizedException(
-          `Invalid login credentials. ${remainingAttempts} Attempts left`,
-        );
-      }
-
-      throw new UnauthorizedException(`Invalid login credentials`);
+    if (!this.attemptLogin(user, data)) {
+      this.sendFailedLoginResponse(
+        user,
+        await this.incrementLoginAttempts(user),
+      );
     }
 
-    if (user?.FailedLoginAttempt && user?.FailedLoginAttempt?.attempts > 0) {
-      this.resetFailedLoginAttempts(user);
-    }
+    this.clearLoginAttempts(user);
 
     delete user.FailedLoginAttempt;
 
     return { user, token: await this.authService.getSignedToken(user) };
   }
 
-  private lockAccount(user: UserEntity): never {
+  private async attemptLogin(
+    user: UserEntity,
+    credentials: LoginCommand,
+  ): Promise<any> {
+    return await bcrypt.compare(credentials.password, user.password);
+  }
+
+  private sendFailedLoginResponse(
+    user: UserEntity,
+    failedAttempts: number,
+  ): void | never {
+    const remainingAttempts = this.maxAttempts() - failedAttempts;
+
+    if (remainingAttempts === 0 && user.FailedLoginAttempt) {
+      const blockedMinutesLeft = this.getBlockedMinutesLeft(
+        user.FailedLoginAttempt?.lastAttemptTime,
+      );
+
+      throw new UnauthorizedException(
+        `Your Account has been blocked, Please try again after ${blockedMinutesLeft} minutes`,
+      );
+    }
+
+    if (remainingAttempts < 3) {
+      throw new UnauthorizedException(
+        `Invalid login credentials. ${remainingAttempts} Attempts left`,
+      );
+    }
+
+    throw new UnauthorizedException(`Invalid login credentials`);
+  }
+
+  private sendLockoutResponse(user: UserEntity): never {
     const blockedMinutesLeft = this.getBlockedMinutesLeft(
       user.FailedLoginAttempt.lastAttemptTime,
     );
@@ -71,20 +88,22 @@ export class LoginAction {
     );
   }
 
-  private async resetFailedLoginAttempts(user: UserEntity): Promise<any> {
-    return await this.failedLoginRepository.update(
-      { userId: user.id },
-      { attempts: 0 },
-    );
+  private async clearLoginAttempts(user: UserEntity): Promise<any> {
+    if (user?.FailedLoginAttempt && user?.FailedLoginAttempt?.attempts > 0) {
+      return await this.failedLoginRepository.update(
+        { userId: user.id },
+        { attempts: 0 },
+      );
+    }
   }
 
-  private async updateFailedAttempts(user: UserEntity) {
+  private async incrementLoginAttempts(user: UserEntity) {
     let attempts = user?.FailedLoginAttempt?.attempts ?? 1;
     const lastFailedAttemptTime = user?.FailedLoginAttempt?.lastAttemptTime;
 
     if (lastFailedAttemptTime) {
       const diff = this.getTimeDiffForAttempt(lastFailedAttemptTime);
-      attempts = diff < this.BLOCKED_FOR ? attempts + 1 : 1;
+      attempts = diff < this.decayMinutes() ? attempts + 1 : 1;
     }
 
     // move this from db to redis
@@ -100,10 +119,10 @@ export class LoginAction {
   private getBlockedMinutesLeft(lastFailedTime: string | Date): number {
     const diff = this.getTimeDiffForAttempt(lastFailedTime);
 
-    return this.BLOCKED_FOR - diff;
+    return this.decayMinutes() - diff;
   }
 
-  private whenAccountHasBeenBlocked(user: UserEntity, callback?: () => void) {
+  private hasTooManyLoginAttempts(user: UserEntity, callback?: () => void) {
     const lastFailedAttempt = user?.FailedLoginAttempt?.lastAttemptTime;
     if (!lastFailedAttempt) return false;
 
@@ -111,13 +130,25 @@ export class LoginAction {
 
     const isBlocked =
       user?.FailedLoginAttempt &&
-      user?.FailedLoginAttempt?.attempts >= this.MAX_LOGIN_TRIES &&
-      diff < this.BLOCKED_FOR;
+      user?.FailedLoginAttempt?.attempts >= this.maxAttempts() &&
+      diff < this.decayMinutes();
 
     if (isBlocked && typeof callback === 'function') {
       return callback();
     }
 
     return isBlocked;
+  }
+
+  public maxAttempts(): number {
+    return this.MAX_LOGIN_ATTEMPTS;
+  }
+
+  public decayMinutes(): number {
+    return this.BLOCKED_FOR;
+  }
+
+  private throttleKey(data: LoginCommand) {
+    return `${data.email.toLowerCase()}`;
   }
 }

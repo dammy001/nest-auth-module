@@ -1,19 +1,20 @@
 import { BadRequestException } from '@nestjs/common';
 import bcrypt from 'bcrypt';
+import { UserRepository } from '@repositories';
 import { AuthService } from '../../services/auth.service';
 import { RegisterCommand } from './register.command';
-import { UserRepository } from '@/src/lib/repositories';
 
 export class RegisterAction {
   constructor(
-    private readonly authService: AuthService,
-    private readonly userRepository: UserRepository,
+    protected readonly authService: AuthService,
+    protected readonly userRepository: UserRepository,
   ) {}
 
   async execute(data: RegisterCommand): Promise<any> {
     if (process.env.DISABLE_USER_REGISTRATION === 'true')
       throw new BadRequestException('Account creation is disabled');
 
+    console.log(data);
     const exists = await this.userRepository.findByEmail(data.email);
 
     if (exists) {
